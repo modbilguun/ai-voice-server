@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: ai-voice-backend
+    env: python
+    buildCommand: ""
+    startCommand: python receiver.py
+    autoDeploy: true
