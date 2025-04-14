@@ -2,3 +2,8 @@ flask
 requests
 openai
 whisper
+torch
+numpy
+transformers
+scipy
+python-dotenv
