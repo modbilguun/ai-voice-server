@@ -2,7 +2,8 @@ from flask import Flask, request, jsonify
 import os
 from whisper_transcribe import transcribe_audio
 from ask_gpt import ask_gpt
-
+from scipy.io import wavfile
+import numpy as np
 
 
 app = Flask(__name__)
@@ -22,6 +23,35 @@ def upload_audio():
     audio_file = request.files["file"]
     if audio_file.filename == "":
         return jsonify({"error": "Файлын нэр хоосон байна"}), 400
+
+    # Хадгалах
+    file_path = os.path.join(UPLOAD_FOLDER, audio_file.filename)
+    audio_file.save(file_path)
+
+    print(f"✅ Хүлээн авлаа: {file_path}")
+
+    # ✅ WAV файлыг numpy waveform болгон унших
+    try:
+        sample_rate, audio_data = wavfile.read(file_path)
+        audio_data = audio_data.astype(np.float32) / 32768.0  # 16-bit PCM → float
+    except Exception as e:
+        return jsonify({"error": f"Файл уншихад алдаа гарлаа: {str(e)}"}), 500
+
+    # 1. Whisper хөрвүүлэлт
+    text = transcribe_audio(audio_data)
+    print("🗣️ Танигдсан текст:", text)
+
+    # 2. GPT хариу
+    reply = ask_gpt(text)
+    print("🤖 GPT хариу:", reply)
+
+    return jsonify({
+        "input": text,
+        "response": reply
+    })
+
+    
+
 
     # Хадгалах
     file_path = os.path.join(UPLOAD_FOLDER, audio_file.filename)
