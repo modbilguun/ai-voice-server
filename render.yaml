@@ -1,7 +1,14 @@
 services:
   - type: web
-    name: ai-voice-backend
+    name: ai-voice-server
     env: python
     buildCommand: ""
-    startCommand: python receiver.py
+    startCommand: gunicorn receiver:app
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: HUGGINGFACE_HUB_TOKEN
+        sync: false
     autoDeploy: true
