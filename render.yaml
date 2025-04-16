@@ -12,3 +12,4 @@ services:
       - key: HUGGINGFACE_HUB_TOKEN
         sync: false
     autoDeploy: true
+    
