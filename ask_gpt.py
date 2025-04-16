@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 def ask_gpt(prompt):
     response = openai.ChatCompletion.create(
