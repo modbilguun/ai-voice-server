@@ -1,48 +1,41 @@
+# app.py – Render дээр ажиллах зориулалттай
 from flask import Flask, request, jsonify
-from whisper_transcribe import transcribe_audio_from_file  # Whisper хөрвүүлэлт
-from ask_gpt import ask_gpt  # ChatGPT API
-from send_response import send_to_phone                    # Хариуг утас руу илгээх
-import os
-import traceback
+import requests
 
 app = Flask(__name__)
 
-UPLOAD_FOLDER = "uploads"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+# Локал PC дээр ажиллаж буй receiver.py-н хаяг (IP-ээ тааруулна уу)
+LOCAL_RECEIVER = "http://192.168.1.100:5000/process_all"  # ← энд өөрийн локал IP-г тавь
 
-@app.route("/process_all", methods=["POST"])
-def process_all():
+@app.route("/", methods=["GET"])
+def root():
+    return "🌐 Render Upload API Working!"
+
+@app.route("/upload", methods=["POST"])
+def upload_audio():
+    if 'audio' not in request.files:
+        return jsonify({"error": "No audio file provided"}), 400
+
+    audio_file = request.files['audio']
+    files = {
+        'audio': (
+            audio_file.filename,
+            audio_file.stream,
+            audio_file.content_type
+        )
+    }
+
     try:
-        if 'audio' not in request.files:
-            return jsonify({"error": "No audio file provided"}), 400
+        print("🔁 Локал receiver рүү илгээж байна...")
+        response = requests.post(LOCAL_RECEIVER, files=files)
 
-        # 1. Аудио хадгалах
-        audio_file = request.files['audio']
-        audio_path = os.path.join(UPLOAD_FOLDER, "latest.wav")
-        audio_file.save(audio_path)
-
-        print("➡️ Whisper хөрвүүлэлт эхэлж байна...")
-        transcript = transcribe_audio_from_file(audio_path)
-        print(f"🎙 Танигдсан текст: {transcript}")
-
-        print("🤖 ChatGPT рүү илгээж байна...")
-        reply = ask_gpt(transcript)
-        print(f"📩 GPT хариу: {reply}")
-
-        print("📲 Утас руу хариу илгээж байна...")
-        send_to_phone(reply)
-
-        return jsonify({
-            "status": "success",
-            "recognized_text": transcript,
-            "gpt_reply": reply
-        })
-
+        if response.ok:
+            return response.json(), response.status_code
+        else:
+            return jsonify({"error": "Local server returned error"}), 500
     except Exception as e:
-        print("❌ Алдаа гарлаа:")
-        traceback.print_exc()
-        return jsonify({"status": "error", "message": str(e)}), 500
+        print(f"❌ Алдаа гарлаа: {e}")
+        return jsonify({"error": "Failed to contact local server"}), 500
 
 if __name__ == "__main__":
-    # Локал болон Render дээр ажиллуулж болно
     app.run(host="0.0.0.0", port=5000)
