@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from whisper_transcribe import transcribe_audio_from_file  # Whisper хөрвүүлэлт
-from ask_gpt import ask_chatgpt                            # ChatGPT API
+from ask_gpt import ask_gpt  # ChatGPT API
 from send_response import send_to_phone                    # Хариуг утас руу илгээх
 import os
 import traceback
@@ -26,7 +26,7 @@ def process_all():
         print(f"🎙 Танигдсан текст: {transcript}")
 
         print("🤖 ChatGPT рүү илгээж байна...")
-        reply = ask_chatgpt(transcript)
+        reply = ask_gpt(transcript)
         print(f"📩 GPT хариу: {reply}")
 
         print("📲 Утас руу хариу илгээж байна...")
