@@ -5,7 +5,7 @@ import requests
 app = Flask(__name__)
 
 # Локал PC дээр ажиллаж буй receiver.py-н хаяг (IP-ээ тааруулна уу)
-LOCAL_RECEIVER = "http://192.168.1.100:5000/process_all"  # ← энд өөрийн локал IP-г тавь
+LOCAL_RECEIVER = "http://192.168.1.160:5000/process_all"  # ← энд өөрийн локал IP-г тавь
 
 @app.route("/", methods=["GET"])
 def root():
