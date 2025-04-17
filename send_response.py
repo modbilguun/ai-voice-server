@@ -1,6 +1,5 @@
 # send_response.py
 import requests
-from send_response import send_to_phone
 
 
 # Утсан дээр ажиллаж байгаа серверийн хаяг (Wi-Fi эсвэл Cloudflare tunnel ашиглаж болно)
