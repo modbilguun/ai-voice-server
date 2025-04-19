@@ -4,7 +4,7 @@ import requests
 app = Flask(__name__)
 
 # Локал receiver.py ажиллаж буй tunnel URL
-LOCAL_RECEIVER = "https://memories-aids-telling-journey.trycloudflare.com"
+LOCAL_RECEIVER = "ber-sponsor-strongly-consent.trycloudflare.com"
 
 @app.route("/", methods=["GET"])
 def root():
