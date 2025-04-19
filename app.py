@@ -1,35 +1,42 @@
-# app.py – Render дээр ажиллах
 from flask import Flask, request, jsonify
 import requests
 
 app = Flask(__name__)
 
-# Локал receiver-г tunnel URL-р дамжуулна
-LOCAL_RECEIVER = "https://mainly-projector-passenger-equipped.trycloudflare.com"
+# Локал receiver.py ажиллаж буй tunnel URL
+LOCAL_RECEIVER = "https://mainly-projector-passenger-equipped.trycloudflare.com/process_all"
 
 @app.route("/", methods=["GET"])
 def root():
-    return "🌐 Render API Working!"
+    return "🌐 Render Upload API Working!"
 
 @app.route("/upload", methods=["POST"])
 def upload_audio():
-    if "audio" not in request.files:
+    if 'audio' not in request.files:
         return jsonify({"error": "No audio file provided"}), 400
 
-    audio_file = request.files["audio"]
-    files = {"audio": (audio_file.filename, audio_file.stream, audio_file.content_type)}
+    audio_file = request.files['audio']
+    files = {
+        'audio': (
+            audio_file.filename,
+            audio_file.stream,
+            audio_file.content_type
+        )
+    }
 
     try:
-        print("📤 Локал руу дамжуулж байна...")
+        print("🔁 Локал receiver рүү илгээж байна...")
         response = requests.post(LOCAL_RECEIVER, files=files)
 
         if response.ok:
-            return response.json(), 200
+            result = response.json()
+            print("✅ Хариу амжилттай ирлээ:", result)
+            return jsonify(result), 200
         else:
-            print("❌ Локал серверээс error ирлээ:", response.status_code)
+            print("❌ Локал серверээс алдаа:", response.status_code)
             return jsonify({"error": "Local server returned error"}), 500
     except Exception as e:
-        print("❌ Холболт амжилтгүй:", e)
+        print(f"❌ Алдаа гарлаа: {e}")
         return jsonify({"error": "Failed to contact local server"}), 500
 
 if __name__ == "__main__":
