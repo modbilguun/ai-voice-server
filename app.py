@@ -5,7 +5,7 @@ import requests
 app = Flask(__name__)
 
 # Локал PC дээр ажиллаж буй receiver.py-н хаяг (IP-ээ тааруулна уу)
-LOCAL_RECEIVER = "https://encouraged-christopher-afterwards-accessed.trycloudflare.com"  # ← энд өөрийн локал IP-г тавь
+LOCAL_RECEIVER = "https://te-authorized-naples-gmt.trycloudflare.com"  # ← энд өөрийн локал IP-г тавь
 
 @app.route("/", methods=["GET"])
 def root():
